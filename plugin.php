@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Core constants 
-define("EMERTECH_TRANSFORM_DIR", plugin_dir_path(__DIR__));
+define("EMERTECH_TRANSFORM_DIR", plugin_dir_path(__DIR__) . 'emertech-transform/');
 define("EMERTECH_TRANSFORM_URL", plugins_url("emertech-transform/"));
 define("EMERTECH_TRANSFORM_CLASS_NAME", "Emertech_Transform_Plugin");
 
@@ -31,6 +31,7 @@ final class Emertech_Transform_Plugin {
      */
     public function __construct() {
 
+        // Setup plugin constants
         $this->plugin_constants();
 
         // Initialize blocks PHP
@@ -46,8 +47,15 @@ final class Emertech_Transform_Plugin {
      *
      * @since 1.0
      */
-    public function plugin_constants() {
+    public static function plugin_constants() {
 
+        // JS and CSS paths
+        define('EMERTECH_TRANSFORM_JS_URL', EMERTECH_TRANSFORM_URL . 'assets/js/');
+        define('EMERTECH_TRANSFORM_CSS_URL', EMERTECH_TRANSFORM_URL . 'assets/css/');
+
+        // Include paths
+        define('EMERTECH_TRANSFORM_INC_DIR', EMERTECH_TRANSFORM_DIR . 'inc/');
+        define('EMERTECH_TRANSFORM_INC_URL', EMERTECH_TRANSFORM_URL . 'inc/');
     } 
 
     /**
@@ -55,8 +63,11 @@ final class Emertech_Transform_Plugin {
      *
      * @since 1.0
      */
-    public function plugin_setup() {
+    public static function plugin_setup() {
 
+		$dir = EMERTECH_TRANSFORM_INC_DIR;
+
+		include $dir . 'transform/transform-cpt.php';
     }
 
     /**
@@ -64,7 +75,17 @@ final class Emertech_Transform_Plugin {
      *
      * @since 1.0
      */
-    public function plugin_css() {
+    public static function plugin_css() {
+
+        $dir = EMERTECH_TRANSFORM_CSS_URL;
+
+        // Registering the stylesheet
+        wp_enqueue_style(
+            'emertech-transform', 
+            $dir . 'app.css',
+            null,
+            null
+        );
 
     }
 
@@ -73,7 +94,20 @@ final class Emertech_Transform_Plugin {
      *
      * @since 1.0
      */
-    public function plugin_js() {
+    public static function plugin_js() {
+
+        $dir = EMERTECH_TRANSFORM_JS_URL;
+
+        // Registering the blocks.js file in the dist folder
+        wp_enqueue_script(
+            'emertech-transform-scripts',
+            $dir . 'app.js',
+            null,
+            null,
+            true
+        );
 
     }
 }
+
+new Emertech_Transform_Plugin();
