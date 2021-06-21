@@ -40,6 +40,9 @@ final class Emertech_Transform_Plugin {
         // Enqueue scripts on init        
         add_action('wp_enqueue_scripts', array(EMERTECH_TRANSFORM_CLASS_NAME, 'plugin_css'));
         add_action('wp_enqueue_scripts', array(EMERTECH_TRANSFORM_CLASS_NAME, 'plugin_js'));
+
+        add_action('admin_enqueue_scripts', array(EMERTECH_TRANSFORM_CLASS_NAME, 'plugin_admin_css'));
+        add_action('admin_enqueue_scripts', array(EMERTECH_TRANSFORM_CLASS_NAME, 'plugin_admin_js'));
     }
 
     /**
@@ -68,6 +71,45 @@ final class Emertech_Transform_Plugin {
 		$dir = EMERTECH_TRANSFORM_INC_DIR;
 
 		include $dir . 'transform/transform-cpt.php';
+    }
+
+    /**
+     * Enqueue plugin CSS for admin
+     *
+     * @since 1.0
+     */
+    public static function plugin_admin_css() {
+
+        $dir = EMERTECH_TRANSFORM_CSS_URL;
+
+        // Registering the stylesheet
+        wp_enqueue_style(
+            'emertech-transform', 
+            $dir . 'admin.css',
+            null,
+            null
+        );
+
+    }
+
+    /**
+     * Enqueue plugin JS for admin
+     *
+     * @since 1.0
+     */
+    public static function plugin_admin_js() {
+
+        $dir = EMERTECH_TRANSFORM_JS_URL;
+
+        // Registering the blocks.js file in the dist folder
+        wp_enqueue_script(
+            'emertech-transform-scripts',
+            $dir . 'admin.js',
+            null,
+            null,
+            true
+        );
+
     }
 
     /**

@@ -1,8 +1,9 @@
-let mix = require("webpack-mix");
+let mix = require("laravel-mix");
 
 mix.disableSuccessNotifications();
 
 mix
-    .js('src/app.js', 'js/')
-    .sass('src/app.scss', 'css/')
+    .js('src/js/app.js', 'js/')
+    .sass('src/scss/app.scss', 'css/')
+    .sass('src/scss/admin.scss', 'css/')
     .setPublicPath("assets/");

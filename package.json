@@ -1,18 +1,31 @@
 {
   "name": "emertech-transform",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Exclusive WordPress plugin developed for the Emertech website that can be accessed [here](https://emertech.pt/).\r Used for transformations catalogs, pages and forms.",
+  "main": "webpack.mix.js",
   "scripts": {
-    "dev": "NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/webpack-mix/setup/webpack.config.js",
-    "watch": "NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --progress --hide-modules --config=node_modules/webpack-mix/setup/webpack.config.js",
-    "hot": "NODE_ENV=development webpack-dev-server --inline --hot --config=node_modules/webpack-mix/setup/webpack.config.js",
-    "production": "NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/webpack-mix/setup/webpack.config.js"
+    "development": "mix",
+    "watch": "mix watch",
+    "watch-poll": "mix watch -- --watch-options-poll=1000",
+    "hot": "mix watch --hot",
+    "production": "mix --production"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ETVO/emertech-transform-wp.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ETVO/emertech-transform-wp/issues"
+  },
+  "homepage": "https://github.com/ETVO/emertech-transform-wp#readme",
   "devDependencies": {
-    "webpack-mix": "^3.0.0"
+    "cross-env": "^7.0.3",
+    "laravel-mix": "^6.0.24",
+    "resolve-url-loader": "^4.0.0",
+    "sass": "^1.35.1",
+    "sass-loader": "^12.1.0"
   }
 }
