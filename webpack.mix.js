@@ -4,6 +4,7 @@ mix.disableSuccessNotifications();
 
 mix
     .js('src/js/app.js', 'js/')
+    .js('src/js/boxes.js', 'js/')
     .sass('src/scss/app.scss', 'css/')
     .sass('src/scss/admin.scss', 'css/')
     .setPublicPath("assets/");

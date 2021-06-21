@@ -26,7 +26,11 @@ class Emertech_Transform_Meta {
         if($cpt == null) $cpt = new Emertech_Transform_CPT();
         $this->cpt = $cpt;
         
-        $this->register_meta_boxes();
+        // Register all of the meta data
+        // $this->register_meta_boxes();
+
+        // Enqueue JS files with rendering for the meta boxes
+        // add_action('admin_enqueue_scripts', [$this, 'enqueue_boxes_js'] );
     }
 
     /**
@@ -36,51 +40,50 @@ class Emertech_Transform_Meta {
      */
     public function register_meta_boxes() {
         $post_type = $this->cpt->get_slug();
-        $prefix = "emertech_$post_type";
-
-        add_meta_box(
-            $prefix . '_gallery',
-            __('Galeria de Fotos'),
-            [$this, 'render_meta_gallery'],
-            $post_type,
-            'normal',
-            'default'
-        );
-        add_action('save_post', [$this, 'save_meta_gallery'], 10, 2);
-    }
-
-    /**
-     * Render meta box for Gallery
-     *
-     * @param WP_Post $post
-     * @since 1.0
-     */
-    public function render_meta_gallery(WP_Post $post) {
+        $prefix = "_$post_type";
         
-        // Add nonce for security and authentication.
-        wp_nonce_field( 'custom_nonce_action', 'transform_gallery_nonce' );
+        register_post_meta( 
+            $post_type, 
+            $prefix . '_gallery', 
+            array(
+                'description'   => __('Galeria de fotos da transformação'),
+                'single'        => true,
+                'type'          => 'string',
+                'show_in_rest'  => true,
+                'sanitize_callback' => [$this, 'sanitize_array_value'] // Type is string, but we use it as an array 
+            ) 
+        );
     }
 
     /**
-     * Save meta box for Gallery
+     * Sanitize string to use as array
      *
-     * @param WP_Post $post
-     * @param integer $post_id
+     * @param string $meta_value
+     * @param string $meta_key
+     * @param string $meta_type
+     * 
      * @since 1.0
      */
-    public function save_meta_gallery(WP_Post $post, int $post_id) {
-        $safe = 'a';
-        // Check if the meta box can be saved safely
-        if(! $safe = $this->is_save_safe('transform_gallery_nonce', $post_id))
-            return;
+    public function sanitize_array_value(string $meta_value, string $meta_key, string $meta_type) {
+        return serialize( json_decode( $meta_value ) );
+    }
+    
+    /**
+     * Enqueue boxes rendering scripts (that use JSX)
+     *
+     * @since 1.0
+     */
+    public function enqueue_boxes_js() {
 
-        echo $safe;
- 
-        // Sanitize the user input.
-        $mydata = sanitize_text_field( $_POST['myplugin_new_field'] );
- 
-        // Update the meta field.
-        update_post_meta( $post_id, '_my_meta_value_key', $mydata );
+        $dir = EMERTECH_TRANSFORM_JS_URL;
+
+        wp_enqueue_script(
+            'emertech-transform-boxes-scripts',
+            $dir . 'boxes.js',
+            [ 'wp-element', 'wp-blocks', 'wp-components', 'wp-editor' ],
+            null,
+            true
+        );
     }
 
 

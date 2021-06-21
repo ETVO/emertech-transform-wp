@@ -49,7 +49,7 @@ class Emertech_Transform_CPT {
      * @return void
      */
     public function register_taxonomy_for_cpt() {
-        $taxonomy_slug = 'type';
+        $taxonomy_slug = 'tipo';
         $post_type = $this->get_slug();
 
         $labels = array(
@@ -82,7 +82,7 @@ class Emertech_Transform_CPT {
                 'description'           => __( 'Tipos de Veículos transformados' ),
                 'public'                => true,
                 'hierarchical'          => true,
-                'show_in_rest'          => false,
+                'show_in_rest'          => true,
                 'show_admin_column'     => true,
                 // 'meta_box_cb'           => [$this, ''],
                 'rewrite'               => array('slug' => $taxonomy_slug, 'with_front' => false),
@@ -169,6 +169,7 @@ class Emertech_Transform_CPT {
             'editor',
             'thumbnail',
             'excerpt',
+            'custom-fields',
             'revisions',
             'page-attributes'
         );
@@ -178,7 +179,7 @@ class Emertech_Transform_CPT {
             'labels'                => $labels,
             'description'           => __( 'Transformações de veículos realizadas pela Emertech' ),
             'public'                => true,
-            // 'show_in_rest'          => true,
+            'show_in_rest'          => true,
             'hierarchical'          => false,
             'menu_position'         => 31,
             'menu_icon'             => 'data:image/svg+xml;base64,' . base64_encode('<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#f0f6fc99" class="bi bi-hammer" viewBox="0 0 16 16"><path d="M9.972 2.508a.5.5 0 0 0-.16-.556l-.178-.129a5.009 5.009 0 0 0-2.076-.783C6.215.862 4.504 1.229 2.84 3.133H1.786a.5.5 0 0 0-.354.147L.146 4.567a.5.5 0 0 0 0 .706l2.571 2.579a.5.5 0 0 0 .708 0l1.286-1.29a.5.5 0 0 0 .146-.353V5.57l8.387 8.873A.5.5 0 0 0 14 14.5l1.5-1.5a.5.5 0 0 0 .017-.689l-9.129-8.63c.747-.456 1.772-.839 3.112-.839a.5.5 0 0 0 .472-.334z"/></svg>'),

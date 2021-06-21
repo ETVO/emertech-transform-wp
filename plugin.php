@@ -82,7 +82,6 @@ final class Emertech_Transform_Plugin {
 
         $dir = EMERTECH_TRANSFORM_CSS_URL;
 
-        // Registering the stylesheet
         wp_enqueue_style(
             'emertech-transform', 
             $dir . 'admin.css',
@@ -101,11 +100,10 @@ final class Emertech_Transform_Plugin {
 
         $dir = EMERTECH_TRANSFORM_JS_URL;
 
-        // Registering the blocks.js file in the dist folder
         wp_enqueue_script(
             'emertech-transform-scripts',
             $dir . 'admin.js',
-            null,
+            [ 'wp-element', 'wp-blocks', 'wp-components', 'wp-editor' ],
             null,
             true
         );
@@ -121,7 +119,6 @@ final class Emertech_Transform_Plugin {
 
         $dir = EMERTECH_TRANSFORM_CSS_URL;
 
-        // Registering the stylesheet
         wp_enqueue_style(
             'emertech-transform', 
             $dir . 'app.css',
@@ -140,7 +137,6 @@ final class Emertech_Transform_Plugin {
 
         $dir = EMERTECH_TRANSFORM_JS_URL;
 
-        // Registering the blocks.js file in the dist folder
         wp_enqueue_script(
             'emertech-transform-scripts',
             $dir . 'app.js',
