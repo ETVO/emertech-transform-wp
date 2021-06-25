@@ -37,12 +37,15 @@ final class Emertech_Transform_Plugin {
         // Initialize blocks PHP
         add_action('init', array(EMERTECH_TRANSFORM_CLASS_NAME, 'plugin_setup'));
 
-        // Enqueue scripts on init        
+        // Enqueue scripts      
         add_action('wp_enqueue_scripts', array(EMERTECH_TRANSFORM_CLASS_NAME, 'plugin_css'));
         add_action('wp_enqueue_scripts', array(EMERTECH_TRANSFORM_CLASS_NAME, 'plugin_js'));
 
         add_action('admin_enqueue_scripts', array(EMERTECH_TRANSFORM_CLASS_NAME, 'plugin_admin_css'));
         add_action('admin_enqueue_scripts', array(EMERTECH_TRANSFORM_CLASS_NAME, 'plugin_admin_js'));
+        
+        // Include template file for transform single page
+        add_filter( 'template_include', [$this, 'transform_page_template'], 99 );
     }
 
     /**
@@ -70,7 +73,8 @@ final class Emertech_Transform_Plugin {
 
 		$dir = EMERTECH_TRANSFORM_INC_DIR;
 
-		include $dir . 'transform/transform-cpt.php';
+		require_once $dir . 'transform/transform-cpt.php';
+		require_once $dir . 'helpers.php';
     }
 
     /**
@@ -99,14 +103,6 @@ final class Emertech_Transform_Plugin {
     public static function plugin_admin_js() {
 
         $dir = EMERTECH_TRANSFORM_JS_URL;
-
-        wp_enqueue_script(
-            'emertech-transform-scripts',
-            $dir . 'admin.js',
-            [ 'wp-element', 'wp-blocks', 'wp-components', 'wp-editor' ],
-            null,
-            true
-        );
 
     }
 
@@ -145,6 +141,26 @@ final class Emertech_Transform_Plugin {
             true
         );
 
+    }
+    
+    function transform_page_template( $template ) {
+        $file_name = 'single-transform.php';
+        
+        // If the page is a singular of transform custom post
+        if ( is_singular( 'transform' )  ) {
+            
+            // If template is not found in theme's folder, use plugin's template as a fallback
+            if ( locate_template( $file_name ) ) {
+                $new_template = locate_template( $file_name );
+            } else {
+                $new_template = dirname( __FILE__ ) . '/' . $file_name;
+            }
+
+            if ( '' != $new_template ) {
+                return $new_template ;
+            }
+        }
+        return $template;
     }
 }
 

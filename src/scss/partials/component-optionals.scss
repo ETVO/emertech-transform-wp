@@ -1,0 +1,12 @@
+$primary: #ce1000;
+
+.optionals-group {
+    .list-group-item {
+        background-color: mix(black, #333, 40%) !important;
+        &:hover, &:active, &:focus {
+            transition: background .15s ease;
+            background-color: mix(mix(black, #444, 40%), $primary, 50%) !important;
+            background-color: #333 !important;
+        }
+    }
+}

@@ -1,4 +1,4 @@
-<?php
+<?php 
 /**
  * Create Transformations Meta Custom Fields
  * 
@@ -9,98 +9,119 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-
+ 
 /**
- * Meta fields for Emertech Transformations
+ * Setup Meta Box for Emertech Transformations
  */
 class Emertech_Transform_Meta {
-
-    protected Emertech_Transform_CPT $cpt;
-
+ 
     /**
-     * Construct class
+     * Hook into the appropriate actions when the class is constructed.
      * 
      * @since 1.0
      */
-    public function __construct(Emertech_Transform_CPT $cpt = null) {
-        if($cpt == null) $cpt = new Emertech_Transform_CPT();
-        $this->cpt = $cpt;
-        
-        // Register all of the meta data
-        // $this->register_meta_boxes();
-
-        // Enqueue JS files with rendering for the meta boxes
-        // add_action('admin_enqueue_scripts', [$this, 'enqueue_boxes_js'] );
+    public function __construct() {
+        add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
+        add_action( 'save_post',      array( $this, 'save'         ) );
     }
-
+ 
     /**
-     * Register all of the meta boxes
-     *
-     * @since 1.0
-     */
-    public function register_meta_boxes() {
-        $post_type = $this->cpt->get_slug();
-        $prefix = "_$post_type";
-        
-        register_post_meta( 
-            $post_type, 
-            $prefix . '_gallery', 
-            array(
-                'description'   => __('Galeria de fotos da transformação'),
-                'single'        => true,
-                'type'          => 'string',
-                'show_in_rest'  => true,
-                'sanitize_callback' => [$this, 'sanitize_array_value'] // Type is string, but we use it as an array 
-            ) 
-        );
-    }
-
-    /**
-     * Sanitize string to use as array
-     *
-     * @param string $meta_value
-     * @param string $meta_key
-     * @param string $meta_type
+     * Adds the meta box container.
      * 
      * @since 1.0
      */
-    public function sanitize_array_value(string $meta_value, string $meta_key, string $meta_type) {
-        return serialize( json_decode( $meta_value ) );
+    public function add_meta_box( $post_type ) {
+        // Limit meta box to certain post types.
+        $post_types = array( 'post', 'page' );
+        
+        $box_label = __('Opcionais para esta transformação');
+        if ( $post_type == 'transform' ) {
+            add_meta_box(
+                'emertech_transform_optionals',
+                $box_label,
+                array( $this, 'render_meta_box_content' ),
+                $post_type,
+                'advanced',
+                'high'
+            );
+        }
     }
+ 
+    /**
+     * Render Meta Box content.
+     *
+     * @param WP_Post $post The post object.
+     * @since 1.0
+     */
+    public function render_meta_box_content( WP_Post $post ) {
+ 
+        // Add an nonce field so we can check for it later.
+        wp_nonce_field( 'emertech_transform_nonce', 'emertech_transform_nonce' );
+ 
+        // Use get_post_meta to retrieve an existing value from the database.
+        $value = get_post_meta( $post->ID, 'et_transform_optionals', true );
+        
+        // Display the form, using the current value.
+        ?>
+        <label for="et_transform_optionals" style="display: block;">
+            <?php _e( 'Opcionais'); ?>
+        </label>
+        <input type="text" id="et_transform_optionals" name="et_transform_optionals" value="<?php echo esc_attr( $value ); ?>" size="25" />
+        <?php
+    }
+    /**
+     * Save the meta when the post is saved.
+     *
+     * @param int $post_id The ID of the post being saved.
+     * @since 1.0
+     */
+    public function save( int $post_id ) {
     
-    /**
-     * Enqueue boxes rendering scripts (that use JSX)
-     *
-     * @since 1.0
-     */
-    public function enqueue_boxes_js() {
+        /*
+         * We need to verify this came from the our screen and with proper authorization,
+         * because save_post can be triggered at other times.
+         */
+    
+        // Check if our nonce is set.
+        if ( ! isset( $_POST['emertech_transform_nonce'] ) ) {
+            return $post_id;
+        }
+    
+        $nonce = $_POST['emertech_transform_nonce'];
+    
+        // Verify that the nonce is valid.
+        if ( ! wp_verify_nonce( $nonce, 'emertech_transform_nonce' ) ) {
+            return $post_id;
+        }
+    
+        /*
+         * If this is an autosave, our form has not been submitted,
+         * so we don't want to do anything.
+         */
+        if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+            return $post_id;
+        }
+    
+        // Check the user's permissions.
+        if ( isset( $_POST['post_type'] ) && 'transform' == $_POST['post_type'] ) {
+            if ( ! current_user_can( 'edit_page', $post_id ) ) {
+                return $post_id;
+            }
+        } else {
+            if ( ! current_user_can( 'edit_post', $post_id ) ) {
+                return $post_id;
+            }
+        }
+    
+        /* OK, now it's safe for us to save the data. */
 
-        $dir = EMERTECH_TRANSFORM_JS_URL;
-
-        wp_enqueue_script(
-            'emertech-transform-boxes-scripts',
-            $dir . 'boxes.js',
-            [ 'wp-element', 'wp-blocks', 'wp-components', 'wp-editor' ],
-            null,
-            true
-        );
-    }
-
-
-    public function is_save_safe($custom_nonce_name, $post_id) {
-        // Add nonce for security and authentication.
-        $nonce_name   = isset( $_POST[$custom_nonce_name] ) ? $_POST[$custom_nonce_name] : '';
-        $nonce_action = 'custom_nonce_action';
-
-        $safe = true;
-
-        // Check if nonce is valid.
-        $safe &= wp_verify_nonce( $nonce_name, $nonce_action );
-        $safe &= current_user_can( 'edit_post', $post_id );
-        $safe &= ! wp_is_post_autosave( $post_id );
-        $safe &= ! wp_is_post_revision( $post_id );
+        if( isset( $_POST['et_transform_optionals'] ) ) {
+            // Sanitize the user input.
+            $value = sanitize_text_field( $_POST['et_transform_optionals'] );
         
-        return $safe;
+            // Update the meta field.
+            update_post_meta( $post_id, 'et_transform_optionals', $value );
+        }
+    
     }
-
 }
