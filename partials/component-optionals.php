@@ -12,6 +12,8 @@ $optionals = get_the_terms( get_the_ID(), $taxonomy );
 $parents = array();
 $grouped_optionals = array();
 
+if($optionals):
+
 foreach($optionals as $optional) {
 
     if($parent = get_term_top_parent($optional, $taxonomy)){
@@ -127,4 +129,6 @@ foreach($parents as $parent):
     <?php
 
 endforeach;
+
+endif; // If not empty
 ?>
