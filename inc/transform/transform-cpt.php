@@ -46,8 +46,7 @@ class Emertech_Transform_CPT
 
         $this->register_tipo_for_cpt();
         $this->register_opcional_for_cpt();
-        // add_action( 'load-post.php',        [$this, 'register_meta_box_transform'] );
-        // add_action( 'load-post-new.php',    [$this, 'register_meta_box_transform'] );
+        $this->register_caracteristica_for_cpt();
     }
 
     /**
@@ -147,16 +146,55 @@ class Emertech_Transform_CPT
                 'sort'                  => true
             )
         );
+    }
 
-        // Add filter to hide hierarchical dropdown
-        add_filter( 
-            'post_edit_category_parent_dropdown_args', 
-            function ( $args ) {
-                if ( 'opcional' == $args['taxonomy'] ) {
-                    $args['echo'] = false;
-                }
-                return $args;
-            } 
+    public function register_caracteristica_for_cpt()
+    {
+        $post_type = $this->get_slug();
+
+        /**
+         * taxonomy_slug
+         * The same value is used in a filter at the end of the function 
+         * (must be changed in both places if necessary)
+         */ 
+        $taxonomy_slug = 'caracter'; 
+
+        $labels = array(
+            'name'                          => __('Características'),
+            'singular_name'                 => __('Característica'),
+            'search_items'                  => __('Pesquisar características'),
+            'popular_items'                 => __('Características populares'),
+            'all_items'                     => __('Todas as características'),
+            'parent_items'                  => __('Características superiores'),
+            'parent_item_colon'             => __('Características superiores:'),
+            'edit_item'                     => __('Editar característica'),
+            'view_item'                     => __('Ver característica'),
+            'update_item'                   => __('Actualizar característica'),
+            'add_new_item'                  => __('Adicionar nova característica'),
+            'new_item_name'                 => __('Nova característica'),
+            'separate_items_with_commas'    => __('Separar características com vírgulas'),
+            'add_or_remove_items'           => __('Adicionar ou remover característica'),
+            'choose_from_most_used'         => __('Escolher das características mais usadas'),
+            'not_found'                     => __('Nenhum característica encontrada'),
+            'no_terms'                      => __('Sem características'),
+            'filter_by_item'                => __('Filtrar por característica'),
+            'back_to_items'                 => __('Voltar às características'),
+        );
+
+        register_taxonomy(
+            $taxonomy_slug,
+            $post_type,
+            array(
+                'labels'                => $labels,
+                'description'           => __('Características das transformações'),
+                'public'                => true,
+                'hierarchical'          => true,
+                'show_in_rest'          => true,
+                'show_admin_column'     => true,
+                // 'meta_box_cb'           => [$this, ''],
+                'rewrite'               => array('slug' => $taxonomy_slug, 'with_front' => false),
+                'sort'                  => true
+            )
         );
     }
 

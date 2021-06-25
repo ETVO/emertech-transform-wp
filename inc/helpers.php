@@ -6,9 +6,6 @@
  */
 
  
-/**
- * get_template_part() equivalent function for plugin
- */
 if ( ! function_exists( 'get_transform_template_part' ) ) {
     /**
      * Get plugin template part
@@ -35,9 +32,7 @@ if ( ! function_exists( 'get_transform_template_part' ) ) {
     }
 }
 
-/**
- * Get term top most parent
- */
+
 if ( ! function_exists( 'get_term_top_parent' ) ) {
     /**
      * Get term top most parent
@@ -65,3 +60,22 @@ if ( ! function_exists( 'get_term_top_parent' ) ) {
         return $parent;
     }
 }
+
+
+if ( ! function_exists( 'transform_strip_term' ) ) {
+    /**
+     * Strip term of unused properties
+     *
+     * @param WP_Term $term Term to be used as a basis
+     * @return array
+     * @since 1.0
+     */
+    function transform_strip_term(WP_Term $term):array {
+        return array(
+            "slug" => $term->slug,
+            "name" => $term->name,
+            "description" => $term->description,
+        );
+    }
+}
+

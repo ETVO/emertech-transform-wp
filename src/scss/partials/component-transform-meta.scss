@@ -1,6 +1,6 @@
 $primary: #ce1000;
 
-.optionals-group {
+.transform-meta-group {
     .list-group-item {
         background-color: mix(black, #333, 40%) !important;
         &:hover, &:active, &:focus {
@@ -8,5 +8,29 @@ $primary: #ce1000;
             background-color: mix(mix(black, #444, 40%), $primary, 50%) !important;
             background-color: #333 !important;
         }
+    }
+}
+
+.optionals-group {
+    margin: 1rem 0;
+
+    &:first-of-type {
+        margin-top: 0;
+    }
+    
+    &:last-of-type {
+        margin-bottom: 0;
+    }
+}
+
+.caracters-group {
+    margin: 1rem 0;
+
+    &:first-of-type {
+        margin-top: 0;
+    }
+    
+    &:last-of-type {
+        margin-bottom: 0;
     }
 }

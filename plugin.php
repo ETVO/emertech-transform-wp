@@ -46,6 +46,9 @@ final class Emertech_Transform_Plugin {
         
         // Include template file for transform single page
         add_filter( 'template_include', [$this, 'transform_page_template'], 99 );
+
+        // Modify archive query for custom post type
+        add_action( 'pre_get_posts', [$this, 'modify_transform_query'] );
     }
 
     /**
@@ -162,6 +165,13 @@ final class Emertech_Transform_Plugin {
         }
         return $template;
     }
+
+    public static function modify_transform_query( $query ) {
+        if ( $query->is_post_type_archive('transform') && ! is_admin() && $query->is_main_query() ) {
+            $query->set( 'posts_per_page', 1000 );
+        }
+    }
+    
 }
 
 new Emertech_Transform_Plugin();

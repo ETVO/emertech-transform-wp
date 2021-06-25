@@ -1,22 +1,13 @@
 <?php
 /**
- * Partial for the single transform page
+ * Partial for the optionals component
  * 
  * @package Emertech WordPress theme
  */
 
+
 $taxonomy = "opcional";
-
 $optionals = get_the_terms( get_the_ID(), $taxonomy );
-
-
-function strip_opcional($term) {
-    return array(
-        "slug" => $term->slug,
-        "name" => $term->name,
-        "description" => $term->description,
-    );
-}
 
 $parents = array();
 $grouped_optionals = array();
@@ -24,8 +15,8 @@ $grouped_optionals = array();
 foreach($optionals as $optional) {
 
     if($parent = get_term_top_parent($optional, $taxonomy)){
-        $parent = strip_opcional($parent);
-        $optional = strip_opcional($optional);
+        $parent = transform_strip_term($parent);
+        $optional = transform_strip_term($optional);
         
         
         $parent_slug = $parent['slug'];
@@ -53,7 +44,7 @@ foreach($parents as $parent):
     $parent_optionals = $grouped_optionals[$parent_slug];
 
     ?> 
-        <div class="optionals-group">
+        <div class="transform-meta-group optionals-group">
 
             <?php if($parent_name != ''): ?>
                 <div class="title">
@@ -72,7 +63,7 @@ foreach($parents as $parent):
             <?php endif; ?>
 
             <?php if(count($parent_optionals) > 0): ?>
-                <div class="list-group mb-4">
+                <div class="list-group">
                     <?php
                         foreach($parent_optionals as $optional):
                             $optional_name = $optional['name'];
@@ -116,9 +107,9 @@ foreach($parents as $parent):
                                     <?php if($optional_desc != ''): ?>
                                         <div class="collapse" id="<?php echo $optional_collapse_id; ?>">
                                             <div class="p-2">
-                                                <h6 class="mb-0">
+                                                <!-- <h6 class="mb-0">
                                                     <?php echo $optional_name; ?>
-                                                </h6>
+                                                </h6> -->
                                                 <p>
                                                     <?php echo $optional_desc; ?>
                                                 </p>
