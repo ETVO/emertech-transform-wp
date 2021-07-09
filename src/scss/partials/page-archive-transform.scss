@@ -1,0 +1,12 @@
+.catalog {
+    .transforms {
+        .card {
+            background-color: var(--bs-dark) !important;
+            transition: background .2s ease;
+            
+            &:hover, &:active, &:focus {
+                background-color: #222 !important;
+            }
+        }
+    }
+}

@@ -9,6 +9,11 @@
 $taxonomy = "opcional";
 $optionals = get_the_terms( get_the_ID(), $taxonomy );
 
+// Get theme mods
+$image_max_height = get_transform_term_image_height();
+$icon = get_transform_term_icon();
+$view_mode_title = get_transform_term_title();
+
 $parents = array();
 $grouped_optionals = array();
 
@@ -17,11 +22,11 @@ if($optionals):
 foreach($optionals as $optional) {
 
     if($parent = get_term_top_parent($optional, $taxonomy)){
-        $parent = transform_strip_term($parent);
-        $optional = transform_strip_term($optional);
+        // Deprecated: was used to make term into an array to save space (now it's unnecessary and inefficient)
+        // $parent = transform_strip_term($parent);
+        // $optional = transform_strip_term($optional);
         
-        
-        $parent_slug = $parent['slug'];
+        $parent_slug = $parent->slug;
 
         if(!isset($parents[$parent_slug])) {
             $parents[$parent_slug] = array();
@@ -38,9 +43,9 @@ foreach($optionals as $optional) {
 
 foreach($parents as $parent):
 
-    $parent_name = $parent['name'];
-    $parent_desc = $parent['description'];
-    $parent_slug = $parent['slug'];
+    $parent_name = $parent->name;
+    $parent_desc = $parent->description;
+    $parent_slug = $parent->slug;
     if($parent_slug == '') return; 
 
     $parent_optionals = $grouped_optionals[$parent_slug];
@@ -68,16 +73,16 @@ foreach($parents as $parent):
                 <div class="list-group">
                     <?php
                         foreach($parent_optionals as $optional):
-                            $optional_name = $optional['name'];
-                            $optional_desc = $optional['description'];
-                            $optional_slug = $optional['slug'];
-
+                            $optional_name = $optional->name;
+                            $optional_desc = $optional->description;
+                            $optional_slug = $optional->slug;
+                            $term_id = $optional->term_id;
+                            $term_image = wp_get_attachment_image_src(get_term_image($term_id));
+                            
                             $optional_id = $optional_slug;
                             $optional_collapse_id = $optional_slug . 'Collapse';
 
                             $fields_name = 'optionals';
-
-                            $view_mode_title = __("Mais informações");
 
                             ?>
                                 <label class="list-group-item bg-secondary text-light" style="cursor: pointer;">
@@ -101,7 +106,7 @@ foreach($parents as $parent):
                                             role="button" 
                                             aria-expanded="false" 
                                             aria-controls="<?php echo $optional_collapse_id; ?>">
-                                                <span class="bi bi-question"></span>
+                                                <span class="bi bi-<?php echo $icon; ?>"></span>
                                             </a>
                                         <?php endif; ?>
                                     </div>
@@ -109,10 +114,11 @@ foreach($parents as $parent):
                                     <?php if($optional_desc != ''): ?>
                                         <div class="collapse" id="<?php echo $optional_collapse_id; ?>">
                                             <div class="p-2">
-                                                <!-- <h6 class="mb-0">
-                                                    <?php echo $optional_name; ?>
-                                                </h6> -->
-                                                <p>
+                                                <?php if(!empty($term_image)): ?>
+                                                    <img src="<?php echo $term_image[0]; ?>" alt="" class="pb-2" 
+                                                    style="max-height: <?php echo $image_max_height; ?>">
+                                                <?php endif; ?>
+                                                <p class="mb-0">
                                                     <?php echo $optional_desc; ?>
                                                 </p>
                                             </div>

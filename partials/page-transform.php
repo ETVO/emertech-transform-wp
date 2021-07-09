@@ -13,3 +13,5 @@
         the_content();
     ?>
 </div>
+
+<script src="<?php echo EMERTECH_TRANSFORM_JS_URL . 'page-transform.js' ?>"></script>

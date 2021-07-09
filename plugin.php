@@ -4,7 +4,7 @@
  * Description: Transformações da Emertech
  * Author: Estevão Rolim
  * Author URI: https://www.linkedin.com/in/estevaoprolim/
- * Version: 1.0
+ * Version: 2.0
  * 
  * @package Emertech Transform Plugin
  */
@@ -44,8 +44,9 @@ final class Emertech_Transform_Plugin {
         add_action('admin_enqueue_scripts', array(EMERTECH_TRANSFORM_CLASS_NAME, 'plugin_admin_css'));
         add_action('admin_enqueue_scripts', array(EMERTECH_TRANSFORM_CLASS_NAME, 'plugin_admin_js'));
         
-        // Include template file for transform single page
+        // Include template files for transform
         add_filter( 'template_include', [$this, 'transform_page_template'], 99 );
+        add_filter( 'template_include', [$this, 'transform_archive_page_template'], 99 );
 
         // Modify archive query for custom post type
         add_action( 'pre_get_posts', [$this, 'modify_transform_query'] );
@@ -107,6 +108,16 @@ final class Emertech_Transform_Plugin {
 
         $dir = EMERTECH_TRANSFORM_JS_URL;
 
+        wp_enqueue_script(
+            'emertech-transform-admin-scripts',
+            $dir . 'admin.js',
+            null,
+            array('jquery'),
+            true
+        );
+        
+        wp_enqueue_media();
+
     }
 
     /**
@@ -146,6 +157,12 @@ final class Emertech_Transform_Plugin {
 
     }
     
+    /**
+     * Include page template from plugin's directory instead of theme's
+     *
+     * @param [type] $template
+     * @return void
+     */
     function transform_page_template( $template ) {
         $file_name = 'single-transform.php';
         
@@ -166,9 +183,47 @@ final class Emertech_Transform_Plugin {
         return $template;
     }
 
+    /**
+     * Include archive template from plugin's directory instead of theme's
+     *
+     * @param [type] $template
+     * @return void
+     */
+    function transform_archive_page_template( $template ) {
+        $file_name = 'archive-transform.php';
+        
+        // If the page is a singular of transform custom post
+        if ( is_post_type_archive('transform') ) {
+            
+            // If template is not found in theme's folder, use plugin's template as a fallback
+            if ( locate_template( $file_name ) ) {
+                $new_template = locate_template( $file_name );
+            } else {
+                $new_template = dirname( __FILE__ ) . '/' . $file_name;
+            }
+
+            if ( '' != $new_template ) {
+                return $new_template ;
+            }
+        }
+        return $template;
+    }
+    
+
     public static function modify_transform_query( $query ) {
+        
         if ( $query->is_post_type_archive('transform') && ! is_admin() && $query->is_main_query() ) {
-            $query->set( 'posts_per_page', 1000 );
+            $query->set( 'posts_per_page', 16 );
+            $query->set( 'order', 'ASC' );
+            
+            if(isset($_GET['tipo'])) {
+                $tipo = $_GET['tipo'];
+                $query->set( 'tax_query', array(
+                    'taxonomy' => 'tipo',
+                    'field' => 'slug',
+                    'terms' => $tipo,
+                ));
+            }
         }
     }
     

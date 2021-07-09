@@ -79,3 +79,60 @@ if ( ! function_exists( 'transform_strip_term' ) ) {
     }
 }
 
+if( ! function_exists( 'get_transform_term_image_height' ) ) {
+
+    /**
+     * Get theme mod for max height of Transform term image
+     *
+     * @param boolean $with_unit
+     * @return string
+     */
+    function get_transform_term_image_height(bool $with_unit = true): string {
+        $image_max_height = &get_theme_mod('emertech_transform_term_image_height');
+        
+        if($with_unit) {
+            if($image_max_height == null || $image_max_height <= 0) 
+                $image_max_height = 'unset';
+            else 
+                $image_max_height .= 'px';
+        }
+        
+        return $image_max_height;
+    }
+}
+
+if( ! function_exists( 'get_transform_term_icon' ) ) {
+
+    /**
+     * Get theme mod for icon of Transform term
+     *
+     * @return string
+     */
+    function get_transform_term_icon(): string {
+        $icon = &get_theme_mod('emertech_transform_term_icon');
+        
+        if($icon == '') {
+            $icon = 'question';
+        }
+        
+        return $icon;
+    }
+}
+
+if( ! function_exists( 'get_transform_term_title' ) ) {
+
+    /**
+     * Get theme mod for hover title of Transform term
+     *
+     * @return string
+     */
+    function get_transform_term_title(): string {
+        $title = &get_theme_mod('emertech_transform_term_title');
+        
+        if($title == '') {
+            $title = __("Mais informações");
+        }
+        
+        return $title;
+    }
+}

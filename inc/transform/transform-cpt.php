@@ -44,9 +44,12 @@ class Emertech_Transform_CPT
 
         register_post_type($slug, $args);
 
+        
         $this->register_tipo_for_cpt();
         $this->register_opcional_for_cpt();
         $this->register_caracteristica_for_cpt();
+
+        new Emertech_Transform_Term_Meta();
     }
 
     /**
@@ -307,4 +310,5 @@ class Emertech_Transform_CPT
 }
 
 require_once 'transform-meta.php';
+require_once 'transform-term-meta.php';
 new Emertech_Transform_CPT();
