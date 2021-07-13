@@ -213,7 +213,10 @@ final class Emertech_Transform_Plugin {
     public static function modify_transform_query( $query ) {
         
         if ( $query->is_post_type_archive('transform') && ! is_admin() && $query->is_main_query() ) {
-            $query->set( 'posts_per_page', 16 );
+            $per_page = get_theme_mod( 'emertech_transform_per_page' );
+            if(!empty($per_page) && $per_page != 0)
+                $query->set( 'posts_per_page', $per_page );
+            
             $query->set( 'order', 'ASC' );
             
             if(isset($_GET['tipo'])) {
