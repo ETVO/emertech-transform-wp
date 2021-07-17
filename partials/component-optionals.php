@@ -41,8 +41,18 @@ foreach($optionals as $optional) {
     $grouped_optionals[$parent_slug][] = $optional;
 }
 
-foreach($parents as $parent):
+usort($parents, function($t1, $t2) {
+    $a = get_term_order($t1->term_id);
+    $b = get_term_order($t2->term_id);
 
+    if ($a == $b) {
+        return 0;
+    }
+    return ($a < $b) ? -1 : 1;
+});
+
+foreach($parents as $parent):
+    
     $parent_name = $parent->name;
     $parent_desc = $parent->description;
     $parent_slug = $parent->slug;

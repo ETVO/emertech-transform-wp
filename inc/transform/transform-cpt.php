@@ -146,7 +146,7 @@ class Emertech_Transform_CPT
                 'show_admin_column'     => true,
                 // 'meta_box_cb'           => [$this, ''],
                 'rewrite'               => array('slug' => $taxonomy_slug, 'with_front' => false),
-                'sort'                  => true
+                'sort'                  => false
             )
         );
     }
