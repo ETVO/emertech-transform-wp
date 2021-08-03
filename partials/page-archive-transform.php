@@ -24,7 +24,7 @@ if($view_more_label == '') $view_more_label = __('Ver Mais');
                         
                         $permalink = esc_url(get_the_permalink());
                         
-                        $image_url = get_the_post_thumbnail_url($post->ID, 'post-thumbnail');
+                        $image_url = get_the_post_thumbnail_url($post->ID, 'thumbnail');
                         $image_alt = get_the_post_thumbnail_caption();
                         
                         $category = get_the_category();
@@ -40,7 +40,7 @@ if($view_more_label == '') $view_more_label = __('Ver Mais');
 
                                 <?php if ($image_url != ''){ ?>
                                     <div class="image">
-                                        <img src="<?php echo $image_url; ?>" class="card-img-top" 
+                                        <img src="<?php echo $image_url; ?>" class="card-img-top rounded" 
                                         alt="<?php echo $image_alt; ?>">
                                     </div>
                                 <?php } else { ?>
