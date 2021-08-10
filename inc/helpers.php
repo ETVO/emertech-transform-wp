@@ -136,3 +136,92 @@ if( ! function_exists( 'get_transform_term_title' ) ) {
         return $title;
     }
 }
+
+if( ! function_exists( 'get_transform_optionals' ) ) {
+
+    /**
+     * Get all singular transform available optionals raw
+     *
+     * @return array Optionals as returned by the get_the_terms() default
+     */
+    function get_transform_optionals(): array {
+        $taxonomy = "opcional";
+        $optionals = get_the_terms( get_the_ID(), $taxonomy );
+        
+        return $optionals;
+    }
+}
+
+if( ! function_exists( 'get_transform_grouped_optionals' ) ) {
+
+    /**
+     * Return provided optionals grouped by parents and sorted by menu_order.
+     * **Structure:**
+     *  - **$parents** _as_ **$parent**
+     *  - **$grouped_optionals[$parent->slug]** _as_ **$optional**
+     *
+     * @param array $optionals Optionals array to group
+     * @return array parents, grouped_optionals
+     */
+    function transform_group_optionals($optionals): array {
+        $taxonomy = "opcional";
+        
+        if(!$optionals) return array();
+        
+        foreach($optionals as $optional) {
+        
+            if($parent = get_term_top_parent($optional, $taxonomy)){
+                // Deprecated: was used to make term into an array to save space (now it's unnecessary and inefficient)
+                // $parent = transform_strip_term($parent);
+                // $optional = transform_strip_term($optional);
+                
+                $parent_slug = $parent->slug;
+        
+                if(!isset($parents[$parent_slug])) {
+                    $parents[$parent_slug] = array();
+                }
+        
+                $parents[$parent_slug] = $parent;
+            }
+            else {
+                $parent_slug = '';
+            }
+        
+            $grouped_optionals[$parent_slug][] = $optional;
+        }
+
+        usort($parents, function($t1, $t2) {
+            $a = get_term_order($t1->term_id);
+            $b = get_term_order($t2->term_id);
+        
+            if ($a == $b) {
+                return 0;
+            }
+            return ($a < $b) ? -1 : 1;
+        });
+
+        return array(
+            'parents' => $parents, 
+            'grouped_optionals' => $grouped_optionals
+        );
+    }
+}
+
+if( ! function_exists( 'get_transform_grouped_optionals' ) ) {
+
+    /**
+     * Return all single transform available optionals grouped by parents and sorted by menu_order.
+     * **Structure:**
+     *  - **$parents** _as_ **$parent**
+     *  - **$grouped_optionals[$parent->slug]** _as_ **$optional**
+     *
+     * @return array $parents, grouped_optionals
+     */
+    function get_transform_grouped_optionals(): array {
+        $optionals = get_transform_optionals();
+
+        return transform_group_optionals($optionals);
+    }
+}
+
+

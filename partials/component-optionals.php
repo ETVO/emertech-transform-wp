@@ -6,50 +6,57 @@
  */
 
 
-$taxonomy = "opcional";
-$optionals = get_the_terms( get_the_ID(), $taxonomy );
+// $taxonomy = "opcional";
+// $optionals = get_the_terms( get_the_ID(), $taxonomy );
 
-// Get theme mods
-$image_max_height = get_transform_term_image_height();
-$icon = get_transform_term_icon();
-$view_mode_title = get_transform_term_title();
+// // Get theme mods
+// $image_max_height = get_transform_term_image_height();
+// $icon = get_transform_term_icon();
+// $view_mode_title = get_transform_term_title();
 
-$parents = array();
-$grouped_optionals = array();
+// $parents = array();
+// $grouped_optionals = array();
+
+// if($optionals):
+
+// foreach($optionals as $optional) {
+
+//     if($parent = get_term_top_parent($optional, $taxonomy)){
+//         // Deprecated: was used to make term into an array to save space (now it's unnecessary and inefficient)
+//         // $parent = transform_strip_term($parent);
+//         // $optional = transform_strip_term($optional);
+        
+//         $parent_slug = $parent->slug;
+
+//         if(!isset($parents[$parent_slug])) {
+//             $parents[$parent_slug] = array();
+//         }
+
+//         $parents[$parent_slug] = $parent;
+//     }
+//     else {
+//         $parent_slug = '';
+//     }
+
+//     $grouped_optionals[$parent_slug][] = $optional;
+// }
+
+// usort($parents, function($t1, $t2) {
+//     $a = get_term_order($t1->term_id);
+//     $b = get_term_order($t2->term_id);
+
+//     if ($a == $b) {
+//         return 0;
+//     }
+//     return ($a < $b) ? -1 : 1;
+// });
+
+$optionals = get_transform_grouped_optionals();
 
 if($optionals):
 
-foreach($optionals as $optional) {
-
-    if($parent = get_term_top_parent($optional, $taxonomy)){
-        // Deprecated: was used to make term into an array to save space (now it's unnecessary and inefficient)
-        // $parent = transform_strip_term($parent);
-        // $optional = transform_strip_term($optional);
-        
-        $parent_slug = $parent->slug;
-
-        if(!isset($parents[$parent_slug])) {
-            $parents[$parent_slug] = array();
-        }
-
-        $parents[$parent_slug] = $parent;
-    }
-    else {
-        $parent_slug = '';
-    }
-
-    $grouped_optionals[$parent_slug][] = $optional;
-}
-
-usort($parents, function($t1, $t2) {
-    $a = get_term_order($t1->term_id);
-    $b = get_term_order($t2->term_id);
-
-    if ($a == $b) {
-        return 0;
-    }
-    return ($a < $b) ? -1 : 1;
-});
+$parents = $optionals['parents'];
+$grouped_optionals = $optionals['grouped_optionals'];
 
 foreach($parents as $parent):
     
