@@ -5,19 +5,145 @@
  * @package Emertech WordPress theme
  */
 
-
-// if(isset($_GET['success']) && $_GET['success'] != 1) {
-                
-// }
-// else {
-//     $new_url = add_query_arg( 'success', 1, get_permalink() );
-//     wp_redirect( $new_url, 303 );
-// }
+$transform_title = get_the_title();
+$report_title = __('Nova Solicitação de Orçamento');
+$fields_title = __('Informações');
+$caracters_title = __('Características');
+$optionals_title = __('Opcionais Escolhidos');
 ?>
 
 <div class="transform-wrap">
     <?php 
         if(isset($_POST['submitTransformForm'])) {
+
+            $loading_title = __('Enviando...');
+            $loading_text = __('Estamos processando a sua solicitação');
+            
+            ?> 
+            <div class="content col-12 col-sm-10 col-md-9 col-lg-8 col-xl-6 m-auto mb-4">
+
+                <div id="containersArea">
+                    <div class="thanks-container text-center">
+                        <h2><?php echo $loading_title; ?></h2>
+                        <p><?php echo $loading_text; ?></p>
+                        <div class="loader m-auto mt-3"></div>
+                    </div>
+                </div>
+            </div>
+            <?php
+    
+            // Send email
+                
+            $fields = Emertech_Transform_Form::get_fields();
+            $selected_optionals = $_POST['optionals'] ?? [];
+            $optionals = array();
+            
+            foreach($selected_optionals as $slug) {
+                array_push($optionals, get_term_by('slug', $slug, 'opcional'));
+            }
+
+            $optionals = transform_group_optionals($optionals);
+            
+            $parents = $optionals['parents'];
+            $grouped_optionals = $optionals['grouped_optionals'];
+
+            // Create Email to send request 
+            
+            $request = new Emertech_Email_Request();
+
+            $request->to = 'geral@emertech.pt';
+            $request->subject = $report_title .' - '. $transform_title;
+
+            $request->use_html();
+
+            $from_name = __('Solicitação de Orçamento');
+            $from_email = 'site@' . $_SERVER['HTTP_HOST'];
+            
+            $request->headers[] = 'From: ' . $from_name . ' <' . $from_email . '>';
+            $request->headers[] = 'Cc: ' . $_POST['email'];
+
+            $message[] = '<h3 style="font-weight: bold">' . $report_title . ' - ' . $transform_title . '</h3>';
+
+
+            $message[] = '<h4 style="font-weight: bold; text-transform: uppercase;">' 
+            . $fields_title . '</h4>';
+
+            foreach($fields as $field) {
+                $message[] = '<p><span style="font-weight: bold">' . $field['label'] . ':</span><br>'
+                . $_POST[$field['name']] . '</p>';
+            }
+
+            $message[] = '<h4 style="font-weight: bold; text-transform: uppercase;">' 
+            . $optionals_title . '</h4>';
+
+            $message[] = '<ul>';
+        
+            foreach($parents as $parent){
+                if($parent->slug == '') continue; 
+
+                $parent_optionals = $grouped_optionals[$parent->slug];
+
+                if(count($parent_optionals) > 0) {
+
+                    $message[] = '<li><h4 style="font-weight: bold; margin-bottom: 0; margin-top: 1em;">' 
+                    . $parent->name . ' (' . count($parent_optionals) 
+                    . ')</h4><ul>';
+
+                    foreach($parent_optionals as $optional) {
+                        $message[] = '<li>' . $optional->name . '</li>';
+                    }
+
+                    $message[] = '</ul></li>';
+
+                }
+            }
+
+            $message = implode('', $message);
+            $message = str_replace("\n.", "\n..", $message);
+
+            $request->message = $message;
+
+            $request->send_mail(true);
+
+            // Create hidden input fields to re-submit the report form 
+            ?>
+            <form action="" method="post" id="showReportForm">
+            <?php
+            foreach(array_keys($_POST) as $key) {
+                if($key == 'submitTransformForm') continue;
+
+                if(is_array($_POST[$key])) {
+                    foreach($_POST[$key] as $value) {
+                        ?>
+                            <input type="hidden" name="<?php echo $key; ?>[]" value="<?php echo $value; ?>">
+                        <?php
+                    }
+                }
+                else {
+                    ?>
+                        <input type="hidden" name="<?php echo $key; ?>" value="<?php echo $_POST[$key]; ?>">
+                    <?php
+                }
+            }
+
+            ?>
+                <input type="hidden" name="showTransformReport" value="true">
+            </form>
+
+            <script>
+                window.onload = function() {
+                    try {
+                        document.getElementById('showReportForm').submit();
+                    }
+                    catch(error) {
+                        console.error(error);
+                    }
+                }
+            </script>
+            <?php
+            
+        }
+        else if(isset($_POST['showTransformReport'])) {
 
             $thanks_title = __('Agradecemos pela sua solicitação.');
             $thanks_text = __('Contactar-lhe-emos o mais breve possível!');
@@ -39,9 +165,9 @@
                         <button type="button" id="printButton" class="btn btn-primary">
                             <?php echo $print_button; ?>
                         </button>
-                        <button type="button" id="backButton" data-et-confirm="<?php echo $back_confirm; ?>" data-et-url="<?php echo home_url(); ?>" class="btn btn-secondary">
+                        <!-- <button type="button" id="backButton" data-et-confirm="<?php echo $back_confirm; ?>" data-et-url="<?php echo home_url(); ?>" class="btn btn-secondary">
                             <?php echo $back_button; ?>
-                        </button>
+                        </button> -->
                         <small class="d-block text-primary pt-2"><?php echo $back_confirm; ?></small>
                     </div>
                 </div>
@@ -52,12 +178,6 @@
                 $logo = get_theme_mod( 'custom_logo' );
                 $logo_src = wp_get_attachment_image_src( $logo , 'full' );
                 $logo_url = $logo_src[0];
-                
-                $transform_title = get_the_title();
-                $report_title = __('Nova Solicitação de Orçamento');
-                $fields_title = __('Campos');
-                $caracters_title = __('Características');
-                $optionals_title = __('Opcionais Escolhidos');
                 
                 $fields = Emertech_Transform_Form::get_fields();
 

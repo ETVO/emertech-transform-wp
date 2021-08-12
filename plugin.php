@@ -79,6 +79,7 @@ final class Emertech_Transform_Plugin {
 
 		require_once $dir . 'transform/transform-cpt.php';
 		require_once $dir . 'transform/transform-form.php';
+		require_once $dir . 'email/email-request.php';
 		require_once $dir . 'helpers.php';
     }
 
