@@ -47,19 +47,3 @@
     display: none;
     font-size: 10pt !important;      
 }
-
-.printBody {
-    background-color: var(--bs-light);
-    color: var(--bs-dark);
-    margin: 1rem;
-    
-    #transformPrintLogo,
-    #transformPrintHomeUrl,
-    #transformPrintContact {
-        display: block;
-    }
-    #transformPrintHomeUrl,
-    #transformPrintContact {
-        color: var(--bs-primary);
-    }
-}

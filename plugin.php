@@ -4,7 +4,7 @@
  * Description: Transformações da Emertech
  * Author: Estevão Rolim
  * Author URI: https://www.linkedin.com/in/estevaoprolim/
- * Version: 2.0
+ * Version: 3.0
  * 
  * @package Emertech Transform Plugin
  */

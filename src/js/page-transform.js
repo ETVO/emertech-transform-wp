@@ -59,29 +59,8 @@ jQuery(document).ready(function() {
     /*** Printing functions */
     
     try {
-        document.getElementById('printButton')
-        .addEventListener('click', () => {
-            var printArea = document.getElementById('printArea');
-            
-            if(printArea == null) {
-                printButton.innerText = 'Erro, tente novamente'
-                return;
-            }
-                
-            printElem(printArea);
-        });
-
-        document.getElementById('backButton')
-        .addEventListener('click', () => {
-            var confirmText = document.getElementById('backButton').getAttribute('data-et-confirm');
-
-            if(confirm(confirmText)) {
-                // window.history.forward();
-                window.history.replaceState(null, null, document.getElementById('backButton').getAttribute('data-et-url'));
-                window.location.href = document.getElementById('backButton').getAttribute('data-et-url');
-            }
-        });
         
+        // DEPRECATED
         function printElem(elem)
         {
             // var mywindow = window.open('', 'PRINT', 'height=3508,width=2480');

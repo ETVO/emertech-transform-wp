@@ -51,16 +51,18 @@ $optionals_title = __('Opcionais Escolhidos');
             
             $request = new Emertech_Email_Request();
 
-            $request->to = 'geral@emertech.pt';
+            $form_target = get_theme_mod('emertech_transform_form_target', 'geral@emertech.pt');
+            $request->to = get_bloginfo('name') . ' <' . $form_target . '>';
+            
             $request->subject = $report_title .' - '. $transform_title;
 
             $request->use_html();
 
-            $from_name = __('Solicitação de Orçamento');
+            $from_name = get_theme_mod( 'emertech_footer_title', 'Emertech' );
             $from_email = 'site@' . $_SERVER['HTTP_HOST'];
             
             $request->headers[] = 'From: ' . $from_name . ' <' . $from_email . '>';
-            $request->headers[] = 'Cc: ' . $_POST['email'];
+            $request->headers[] = 'Cc: ' . $_POST['name'] . ' <' . $_POST['email'] . '>';
 
             $message[] = '<h3 style="font-weight: bold">' . $report_title . ' - ' . $transform_title . '</h3>';
 
@@ -97,6 +99,14 @@ $optionals_title = __('Opcionais Escolhidos');
 
                 }
             }
+            
+            $message[] = '</ul>';
+
+            $message[] = '<small style="color: #777">';
+            $message[] = '--<br>';
+            $message[] = __('Email enviado automaticamente, não responda a este email.');
+            $message[] = '<br><a href="' . home_url() . '">' . home_url() . '</a>';
+            $message[] = '</small>';
 
             $message = implode('', $message);
             $message = str_replace("\n.", "\n..", $message);
@@ -152,27 +162,60 @@ $optionals_title = __('Opcionais Escolhidos');
             $back_button = __('Sair');
             $back_confirm = __('Atenção! Se sair desta página não poderá mais imprimir uma cópia da sua solicitação.');
             
+            $return_button = __('Voltar à Transformação');
+
             ?> 
+            <style type="text/css" media="print">
+                #header, #footer, #bottom, #floating, #containersArea { 
+                    display: none !important; 
+                }
+
+                body {
+                    background-color: var(--bs-light);
+                    color: var(--bs-dark);
+                    margin: 1rem;
+                }
+                
+                #printArea {
+                    display: block;
+                }
+                    
+                #transformPrintLogo,
+                #transformPrintHomeUrl,
+                #transformPrintContact {
+                    display: block;
+                }
+                #transformPrintHomeUrl,
+                #transformPrintContact {
+                    color: var(--bs-primary);
+                }
+            </style>
             <div class="content col-12 col-sm-10 col-md-9 col-lg-8 col-xl-6 m-auto mb-4">
 
                 <div id="containersArea">
                     <div class="thanks-container text-center">
-                        <h2><?php echo $thanks_title; ?></h2>
-                        <p><?php echo $thanks_text; ?></p>
+                        <h2 data-aos="fade-right" data-aos-delay="100"><?php echo $thanks_title; ?></h2>
+                        <p data-aos="fade-right" data-aos-delay="200"><?php echo $thanks_text; ?></p>
                     </div>
     
-                    <div class="options-container text-center my-3">
-                        <button type="button" id="printButton" class="btn btn-primary">
+                    <div class="options-container text-center my-3" data-aos="fade" data-aos-delay="300">
+                        <button type="button" id="printButton" class="btn btn-primary d-none d-sm-block" onclick="print()">
                             <?php echo $print_button; ?>
                         </button>
+
+                        <a href="<?php get_permalink(); ?>" class="btn btn-secondary">
+                            <?php echo $return_button; ?>    
+                        </a>
                         <!-- <button type="button" id="backButton" data-et-confirm="<?php echo $back_confirm; ?>" data-et-url="<?php echo home_url(); ?>" class="btn btn-secondary">
                             <?php echo $back_button; ?>
                         </button> -->
-                        <small class="d-block text-primary pt-2"><?php echo $back_confirm; ?></small>
+                        <small class="d-none text-primary pt-2">
+                            <?php echo $back_confirm; ?>
+                        </small>
                     </div>
                 </div>
 
-                <div id="printArea" class="p-3 bg-light text-dark rounded"> 
+                <div id="printArea" class="p-3 bg-light text-dark rounded d-none d-sm-block"> 
                 <?php
                 
                 $logo = get_theme_mod( 'custom_logo' );
@@ -328,4 +371,4 @@ $optionals_title = __('Opcionais Escolhidos');
     ?>
 </div>
 
-<script src="<?php echo EMERTECH_TRANSFORM_JS_URL . 'page-transform.js' ?>"></script>
+<script src="<?php echo EMERTECH_TRANSFORM_JS_URL . 'page-transform.js?v=1' ?>"></script>
